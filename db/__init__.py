@@ -10,6 +10,10 @@ def split_data(csv_file: str):
             - CSV columns are prefixed, you should recognize some entities.
             - You may want to extract also countries and cities.
     """
+    doc = open(csv_file, 'r')
+    lst_lignes = doc.readlines()
+    lst_lignes = lst_lignes.split(",")
+    
     pass
 
 def transform_data(csv_file: str):
