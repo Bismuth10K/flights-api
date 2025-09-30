@@ -1,19 +1,19 @@
 import sqlite3
-import utils
+#import utils
+import pandas as pd
 
 
 def split_data(csv_file: str):
+    table = pd.read_csv(csv_file, header = 0)
+    print(table.head(10))
     """
-        Split data into multiple list or pandas Dataframe
-        
-        Tips:
-            - CSV columns are prefixed, you should recognize some entities.
-            - You may want to extract also countries and cities.
+    print("\t ------------")
+    print (table.info())
+    print("\t ------------")
+    print(table["airline_name"])
     """
-    
-    
+    return table
 
-    pass
 
 def transform_data(csv_file: str):
     """
@@ -21,8 +21,28 @@ def transform_data(csv_file: str):
         e.g delete useless or rename columns
 
     """
-    split_data(csv_file)
-    pass
+    table = split_data(csv_file)
+    table_airlines = table[["airline_ICAO","airline_name","airline_iso2_country"]]
+    table_flights = table[["flight_price_usd","flight_departure", "flight_arrival","flight_airline_icao","flight_src","flight_dst","flight_plane"]]
+    table_aircraft = table[["plane_name","plane_icao"]]
+    table_airport = table[["airport_icao_code","airport_iata_code","airport_id","airport_type","airport_name","airport_lon","airport_lat","airport_city_name","airport_country_code"]]
+    table_country = table[["airport_country_code","airport_country_name"]]
+    table_aircraft.dropna(axis = 0,how = 'all',inplace = True)
+    table_airlines.dropna(axis = 0,how = 'all',inplace = True)
+    table_airport.dropna(axis = 0,how = 'all',inplace = True)
+    table_country.dropna(axis = 0,how = 'all',inplace = True)
+    table_flights.dropna(axis = 0,how = 'all',inplace = True)
+    print(table_airlines.head(5))
+    print("\t ---------")
+    print(table_flights.head(5))
+    print("\t ---------")
+    print(table_aircraft.head(5))
+    print("\t ---------")
+    print(table_airport.head(5))
+    print("\t ---------")
+    print(table_country.head(5))
+    """transformer après coup en SQL"""
+
 
 def get_db_connexion():
     # Loads the app config into the dictionary app_config.
@@ -161,6 +181,8 @@ def init_database():
     """Initialise the database by creating the database
     and populating it.
     """
+    #split_data("./data/all.csv")
+    transform_data("./data/all.csv")
     try:
         conn = get_db_connexion()
 
