@@ -1,12 +1,12 @@
 import sqlite3
-#import utils
+import utils
 import pandas as pd
 
 
 def split_data(csv_file: str):
     table = pd.read_csv(csv_file, header = 0)
-    print(table.head(10))
     """
+    print(table.head(10))
     print("\t ------------")
     print (table.info())
     print("\t ------------")
@@ -22,6 +22,7 @@ def transform_data(csv_file: str):
 
     """
     table = split_data(csv_file)
+    
     table_airlines = table[["airline_ICAO","airline_name","airline_iso2_country"]]
     table_flights = table[["flight_price_usd","flight_departure", "flight_arrival","flight_airline_icao","flight_src","flight_dst","flight_plane"]]
     table_aircraft = table[["plane_name","plane_icao"]]
@@ -32,6 +33,7 @@ def transform_data(csv_file: str):
     table_airport.dropna(axis = 0,how = 'all',inplace = True)
     table_country.dropna(axis = 0,how = 'all',inplace = True)
     table_flights.dropna(axis = 0,how = 'all',inplace = True)
+    """
     print(table_airlines.head(5))
     print("\t ---------")
     print(table_flights.head(5))
@@ -40,8 +42,8 @@ def transform_data(csv_file: str):
     print("\t ---------")
     print(table_airport.head(5))
     print("\t ---------")
-    print(table_country.head(5))
-    """transformer après coup en SQL"""
+    print(table_country.head(5))"""
+    return table
 
 
 def get_db_connexion():
@@ -130,8 +132,18 @@ def create_database(cursor, conn):
                 password BINARY(256)
             );
             """,
-        # TODO: COMPLETE THE CODE HERE TO CREATE THE OTHER TABLES ####
-    }
+        
+        "Country" : """CREATE TABLE IF NOT EXISTS Country(airport_country_code TEXT PRIMARY KEY, airport_country_name  TEXT)""",
+        "Airlines" : """CREATE TABLE IF NOT EXISTS Airlines(airline_ICAO TEXT PRIMARY KEY, airline_name TEXT,
+            airline_iso2_country TEXT)""",
+
+        "Airports" : """CREATE TABLE IF NOT EXISTS Airports(airport_icao_code TEXT PRIMARY KEY, airport_type TEXT, airport_lat INTEGER,
+          airport_lon INTEGER, airport_city_name TEXT, airport_country_code TEXT, FOREIGN KEY (airport_country_code) REFERENCES Country(airport_country_code))""",
+
+        "Flights" : """CREATE TABLE IF NOT EXISTS Flights(flight_id INTEGER PRIMARY KEY, flight_price_usd INTEGER, flight_departure TEXT, flight_arrival TEXT, 
+            flight_airline_icao TEXT, flight_src TEXT, flight_dst TEXT, flight_plane TEXT)""",
+        "Aircrafts" : """CREATE TABLE IF NOT EXISTS Aircrafts(plane_icao TEXT PRIMARY KEY, plane_name  TEXT, FOREIGN KEY (plane_name) REFERENCES Flights(flight_plane))""",
+          }
     try:
         # To create the tables, we call the function cursor.execute() and we pass it the
         # CREATE TABLE statement as a parameter.
