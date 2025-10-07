@@ -1,6 +1,7 @@
 import sqlite3
 import utils
 import pandas as pd
+from sqlalchemy import create_engine 
 
 
 def split_data(csv_file: str):
@@ -25,16 +26,22 @@ def transform_data(csv_file: str):
     
     table_airlines = table[["airline_ICAO","airline_name","airline_iso2_country"]]
     table_flights = table[["flight_price_usd","flight_departure", "flight_arrival","flight_airline_icao","flight_src","flight_dst","flight_plane"]]
-    table_aircraft = table[["plane_name","plane_icao"]]
-    table_airport = table[["airport_icao_code","airport_iata_code","airport_id","airport_type","airport_name","airport_lon","airport_lat","airport_city_name","airport_country_code"]]
+    table_aircraft = table[["plane_icao","plane_name"]]
+    table_airport = table[["airport_icao_code","airport_type","airport_lat","airport_lon","airport_city_name","airport_country_code"]]
     table_country = table[["airport_country_code","airport_country_name"]]
     table_aircraft.dropna(axis = 0,how = 'all',inplace = True)
     table_airlines.dropna(axis = 0,how = 'all',inplace = True)
     table_airport.dropna(axis = 0,how = 'all',inplace = True)
     table_country.dropna(axis = 0,how = 'all',inplace = True)
     table_flights.dropna(axis = 0,how = 'all',inplace = True)
+    table_aircraft.drop_duplicates(subset = "plane_icao",keep = 'first',inplace = True)
+    table_airlines.drop_duplicates(subset = "airline_ICAO",keep = 'first',inplace = True)
+    table_airport.drop_duplicates(subset = "airport_icao_code",keep = 'first',inplace = True)
+    table_country.drop_duplicates(subset = "airport_country_code", keep = 'first',inplace = True)
+    print(str(table_flights.iloc[0]))
+    lst_table = [table_aircraft,table_airlines,table_airport,table_country,table_flights]
     """
-    print(table_airlines.head(5))
+    print(table_airlines)
     print("\t ---------")
     print(table_flights.head(5))
     print("\t ---------")
@@ -43,7 +50,7 @@ def transform_data(csv_file: str):
     print(table_airport.head(5))
     print("\t ---------")
     print(table_country.head(5))"""
-    return table
+    return lst_table
 
 
 def get_db_connexion():
@@ -154,8 +161,6 @@ def create_database(cursor, conn):
             cursor.execute(tables[tablename])
             print("OK")
 
-    ###################################################################
-
     # Exception raised when something goes wrong while creating the tables.
     except sqlite3.Error as error:
         print("An error occurred while creating the tables: {}".format(error))
@@ -172,29 +177,48 @@ def create_database(cursor, conn):
     return True
 
 
-def populate_database(cursor, conn):
-    """Populate the database
+def populate_database(cursor, conn, lst_table):
+    cursor.execute("BEGIN")
+    table = ["Aircrafts","Airlines","Airports","Country","Flights"]
+    try:
+        # To create the tables, we call the function cursor.execute() and we pass it the
+        # CREATE TABLE statement as a parameter.
+        # The function cursor.execute() can raise an exception sqlite3.Error.
+        # That's why we write the code for creating the tables in a try...except block.
+        for j in range(len(table)):
+            print(f"Populating table {table[j]}...", end=" ")
+            for i in range(len(lst_table[j])): 
+                ligne_table = lst_table[j].iloc[i].to_dict()
+                # print(type(ligne_table))
+                if table[j] == "Flights" : 
+                    lst = list(ligne_table.values())
+                    lst.insert(0,i)
+                    str_ligne = str(lst)
+                else : 
+                    str_ligne = str(list(ligne_table.values()))
+                str_ligne = str_ligne.replace('[','(')
+                str_ligne = str_ligne.replace(']',')')
+                # print(str_ligne) 
+                cursor.execute(f"INSERT INTO {table[j]} VALUES {str_ligne}")
+            print("OK")
 
-    Parameters
-    ----------
-    cursor
-        The object used to query the database.
-    conn
-        The object used to manage the database connection.
-    Returns
-    -------
-    bool
-        True if the database is correctly populated, False otherwise.
-    """
-    # TODO
-    pass
+    ###################################################################
+
+    # Exception raised when something goes wrong while creating the tables.
+    except sqlite3.Error as error:
+        print("An error occurred while populating the tables: {}".format(error))
+        # IMPORTANT : we rollback the transaction! No table is created in the database.
+        #conn.rollback()
+        # Return False to indicate that something went wrong.
+        return False
+    
 
 def init_database():
     """Initialise the database by creating the database
     and populating it.
     """
     #split_data("./data/all.csv")
-    transform_data("./data/all.csv")
+    lst_table = transform_data("./data/all.csv")
     try:
         conn = get_db_connexion()
 
@@ -205,7 +229,9 @@ def init_database():
         create_database(cursor, conn)
 
         # Populates the database.
-        # TODO - add call to populate_database()
+        populate_database(cursor, conn, lst_table)
+        
+        conn.commit()
 
         # Closes the connection to the database
         close_db_connexion(cursor, conn)
