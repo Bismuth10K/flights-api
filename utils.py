@@ -18,7 +18,16 @@ def load_config():
     A dictionary.
         The application configuration.
     """
-    # TODO
+    config = {}
+
+    with open(CONFIG_FILE, "r") as f:
+        line = f.readline()
+        while line:
+            key, value = line.split(",")
+            config[key] = value.strip()
+            line = f.readline()
+    return config
+
 
 load_config()
 def hash_password(plain_password):

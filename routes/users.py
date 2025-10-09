@@ -56,8 +56,17 @@ def get_user(user_name):
                 is not in the database
         500 if an error occured while fetching the user
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    conn = get_db_connexion()
+    cursor = conn.cursor()
+
+    user = db.users.get_user(user_name, cursor)
+    if user == None:
+        conn.rollback()
+        close_db_connexion(cursor, conn)
+        return "Error: while fetching users", 500
+    conn.commit()
+    close_db_connexion(cursor, conn)
+    return jsonify({"user": dict(user)})
 
 
 @users_bp.route("/<user_name>", methods=["PATCH"])
@@ -83,8 +92,23 @@ def patch_password(user_name):
         404 if no password is provided in the request
         500 if an error occured while updating the password
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    try:
+        new_password = request.json.get('password')
+        print(new_password)
+        if not new_password:
+            return jsonify({"message": "Password not provided"}), 404
+
+        conn = get_db_connexion()
+        cursor = conn.cursor()
+        result = db.users.update_password(user_name, new_password, cursor)
+
+        if result:
+            return jsonify({"message": "Password modified successfully"}), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+
+    except Exception as e:
+        return jsonify({"message": f"Error: while updating password - {str(e)}"}), 500
 
 
 @users_bp.route("/", methods=["POST"])
@@ -105,5 +129,25 @@ def add_user():
         404 if no username and password are provided in the request
         500 if an error occured while updating the password
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    try:
+        username = request.json.get('username')
+        password = request.json.get('password')
+
+        if not username or not password:
+            return jsonify({"message": "Username or password not provided"}), 404
+
+        user = {
+            "username": username,
+            "password": password
+        }
+
+        conn = get_db_connexion()
+        cursor = conn.cursor()
+        db.users.insert_user(user, cursor)
+        
+        conn.commit()
+
+        return jsonify({"message": "Done"}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: while adding a new user - {str(e)}"}), 500
