@@ -2,6 +2,9 @@ import sqlite3
 import utils
 import pandas as pd
 from sqlalchemy import create_engine 
+from db.booking import *
+
+
 
 
 def split_data(csv_file: str):
@@ -29,17 +32,20 @@ def transform_data(csv_file: str):
     table_aircraft = table[["plane_icao","plane_name"]]
     table_airport = table[["airport_icao_code","airport_type","airport_lat","airport_lon","airport_city_name","airport_country_code"]]
     table_country = table[["airport_country_code","airport_country_name"]]
+    table_city = table[["airport_city_name","airport_country_code"]]
     table_aircraft.dropna(axis = 0,how = 'all',inplace = True)
     table_airlines.dropna(axis = 0,how = 'all',inplace = True)
     table_airport.dropna(axis = 0,how = 'all',inplace = True)
     table_country.dropna(axis = 0,how = 'all',inplace = True)
     table_flights.dropna(axis = 0,how = 'all',inplace = True)
+    table_city.dropna(axis = 0,how = 'all',inplace = True)
     table_aircraft.drop_duplicates(subset = "plane_icao",keep = 'first',inplace = True)
     table_airlines.drop_duplicates(subset = "airline_ICAO",keep = 'first',inplace = True)
     table_airport.drop_duplicates(subset = "airport_icao_code",keep = 'first',inplace = True)
     table_country.drop_duplicates(subset = "airport_country_code", keep = 'first',inplace = True)
-    print(str(table_flights.iloc[0]))
-    lst_table = [table_aircraft,table_airlines,table_airport,table_country,table_flights]
+    table_city.drop_duplicates(subset = "airport_city_name", keep = 'first',inplace = True)
+    # print(str(table_flights.iloc[0]))
+    lst_table = [table_aircraft,table_airlines,table_airport,table_country,table_flights,table_city]
     """
     print(table_airlines)
     print("\t ---------")
@@ -144,12 +150,13 @@ def create_database(cursor, conn):
         "Airlines" : """CREATE TABLE IF NOT EXISTS Airlines(airline_ICAO TEXT PRIMARY KEY, airline_name TEXT,
             airline_iso2_country TEXT)""",
 
-        "Airports" : """CREATE TABLE IF NOT EXISTS Airports(airport_icao_code TEXT PRIMARY KEY, airport_type TEXT, airport_lat INTEGER,
+        "Airports" : """CREATE TABLE IF NOT EXISTS Airports(airport_icao_code TEXT PRIMARY KEY, airport_id TEXT, airport_type TEXT, airport_lat INTEGER,
           airport_lon INTEGER, airport_city_name TEXT, airport_country_code TEXT, FOREIGN KEY (airport_country_code) REFERENCES Country(airport_country_code))""",
 
         "Flights" : """CREATE TABLE IF NOT EXISTS Flights(flight_id INTEGER PRIMARY KEY, flight_price_usd INTEGER, flight_departure TEXT, flight_arrival TEXT, 
             flight_airline_icao TEXT, flight_src TEXT, flight_dst TEXT, flight_plane TEXT)""",
         "Aircrafts" : """CREATE TABLE IF NOT EXISTS Aircrafts(plane_icao TEXT PRIMARY KEY, plane_name  TEXT, FOREIGN KEY (plane_name) REFERENCES Flights(flight_plane))""",
+        "City" : """CREATE TABLE IF NOT EXISTS City(city_id TEXT PRIMARY KEY, airport_city_name TEXT, airport_country_code  TEXT)"""
           }
     try:
         # To create the tables, we call the function cursor.execute() and we pass it the
@@ -179,7 +186,7 @@ def create_database(cursor, conn):
 
 def populate_database(cursor, conn, lst_table):
     cursor.execute("BEGIN")
-    table = ["Aircrafts","Airlines","Airports","Country","Flights"]
+    table = ["Aircrafts","Airlines","Airports","Country","Flights","City"]
     try:
         # To create the tables, we call the function cursor.execute() and we pass it the
         # CREATE TABLE statement as a parameter.
@@ -190,15 +197,19 @@ def populate_database(cursor, conn, lst_table):
             for i in range(len(lst_table[j])): 
                 ligne_table = lst_table[j].iloc[i].to_dict()
                 # print(type(ligne_table))
-                if table[j] == "Flights" : 
+                if table[j] == "Flights" or table[j] =="City" : 
                     lst = list(ligne_table.values())
                     lst.insert(0,i)
+                    str_ligne = str(lst)
+                elif table[j] == "Airports": 
+                    lst = list(ligne_table.values())
+                    lst.insert(1,i)
                     str_ligne = str(lst)
                 else : 
                     str_ligne = str(list(ligne_table.values()))
                 str_ligne = str_ligne.replace('[','(')
                 str_ligne = str_ligne.replace(']',')')
-                # print(str_ligne) 
+                # print("\t", str_ligne) 
                 cursor.execute(f"INSERT INTO {table[j]} VALUES {str_ligne}")
             print("OK")
 
@@ -233,7 +244,9 @@ def init_database():
         
         conn.commit()
 
+        # get_country_name_by_code(cursor,iso_code = "BS")
         # Closes the connection to the database
         close_db_connexion(cursor, conn)
+
     except Exception as e:
         print("Error: Database cannot be initialised:", e)

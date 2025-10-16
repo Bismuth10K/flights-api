@@ -1,6 +1,7 @@
 from flask import Flask
 
 from db import init_database
+import db.countries
 
 from routes.users import users_bp
 
