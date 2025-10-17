@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify
 
+from utils import token_required
+
 orders_bp = Blueprint("orders", __name__)
 
 
@@ -30,6 +32,7 @@ def get_booking(order_id: int):
 
 
 @orders_bp.route("/", methods=["POST"])
+@token_required
 def create_booking():
     """Create a new booking.
     The username and flight id must be passed in the JSON body of the POST request.
@@ -56,6 +59,7 @@ def create_booking():
 
 
 @orders_bp.route("/user/<string:user_name>", methods=["GET"])
+@token_required
 def get_user_bookings(user_name):
     """Get all bookings of a user.
 
@@ -80,6 +84,7 @@ def get_user_bookings(user_name):
 
 
 @orders_bp.route("/flight/<int:flight_id>", methods=["GET"])
+@token_required
 def get_flight_users(flight_id):
     """Get all usernames booked on a flight.
 

@@ -1,10 +1,11 @@
-# import bcrypt
-# import jwt
-# import datetime
+import bcrypt
+import jwt
+import datetime
 from functools import wraps
 from flask import request, jsonify
 
 import db
+from db.users import get_user
 
 CONFIG_FILE = "./config/config"
 
@@ -28,7 +29,7 @@ def load_config():
             line = f.readline()
     return config
 
-load_config()
+
 def hash_password(plain_password):
     """Hash a password
 
@@ -42,7 +43,13 @@ def hash_password(plain_password):
     hashed_password
         A password hash
     """
-    return
+    if isinstance(plain_password, str):
+        plain_password = plain_password.encode('utf-8')
+    
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(plain_password, salt)
+    
+    return hashed_password
 
 
 def check_password(plain_password, hashed_password):
@@ -60,8 +67,9 @@ def check_password(plain_password, hashed_password):
     bool
         True if hashed_password is the hash of plain_password, False otherwise
     """
-    # TODO
-    return False
+    if isinstance(plain_password, str):
+        plain_password = plain_password.encode('utf-8')
+    return bcrypt.checkpw(plain_password, hashed_password)
 
 
 def check_spectator(username, plain_password):
@@ -79,11 +87,12 @@ def check_spectator(username, plain_password):
     bool
         True if the password is associated to the user, False otherwise
     """
-    # TODO - Get the user and check it exists
+    conn = db.get_db_connexion()
+    cursor = conn.cursor()
+    user = get_user(username, cursor)
+    db.close_db_connexion(cursor, conn)
 
-    # TODO - Check the password provided
-
-    return False
+    return check_password(plain_password, user["password"])
 
 
 def generate_token(username):
@@ -99,8 +108,19 @@ def generate_token(username):
     token
         the generated token based on the username and an expiracy date of 1h.
     """
-    # TODO - Generate a token using the secret key in the config file
-    return ""
+    try:
+        expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
+
+        payload = {
+            'username': username,
+            'exp': expiration_time
+        }
+
+        token = jwt.encode(payload, load_config()['SECRET_KEY'], algorithm='HS256')
+        return token
+    except Exception as e:
+        print(f"Error generating token: {e}")
+        return None
 
 
 def check_token(token):
@@ -118,13 +138,22 @@ def check_token(token):
         An error if the token is expired or invalid
     """
     try:
-        # TODO: Decode the token using the secret key in the configuration file
-        payload = {}
+        payload = jwt.decode(token, load_config()['SECRET_KEY'], algorithms=['HS256'])
+        
+        if datetime.datetime.now(datetime.timezone.utc) > datetime.datetime.fromtimestamp(payload['exp'], datetime.timezone.utc):
+            print("Token has expired")
+            return None
+        
         return payload
     except jwt.ExpiredSignatureError:
-        raise jwt.ExpiredSignatureError
+        print("Token has expired")
+        return None
     except jwt.InvalidTokenError:
-        raise jwt.InvalidTokenError
+        print("Invalid token")
+        return None
+    except Exception as e:
+        print(f"Error checking token: {e}")
+        return None
 
 
 def token_required(f):
@@ -137,7 +166,7 @@ def token_required(f):
         token = None
 
         if "Authorization" in request.headers:
-            token = request.headers["Authorization"].split(" ")[1]
+            token = request.headers["Authorization"]
 
         if not token:
             return jsonify({"message": "Missing token"}), 401
@@ -154,3 +183,5 @@ def token_required(f):
         return f(*args, **kwargs)
 
     return decorated
+
+load_config()

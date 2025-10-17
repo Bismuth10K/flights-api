@@ -53,6 +53,8 @@ def test_insert_user():
     # Insert user Hubert
     insert_hubert(cursor)
 
+    conn.commit()
+
     # Close connexion
     close_db_connexion(cursor, conn)
 

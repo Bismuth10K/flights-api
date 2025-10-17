@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request
 
+from utils import token_required
 
 flights_bp = Blueprint("flights", __name__)
 
 
 @flights_bp.route("/", methods=["POST"])
+@token_required
 def create_flight():
     """Insert a new flight.
     The flight details must be passed in the JSON body of the POST request.

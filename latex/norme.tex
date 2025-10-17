@@ -1,0 +1,190 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Modèle de rapport pédagogique, doublé d'un tutoriel LaTeX
+%% Vincent Labatut 2014-22 <vincent.labatut@univ-avignon.fr>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Classe du document
+
+% \documentclass{ceri/sty/rapport}
+% \documentclass[handout]{ceri/sty/rapport}
+\documentclass[light]{ceri/sty/rapport}
+% \documentclass[full]{ceri/sty/rapport}
+% \documentclass[blue]{ceri/sty/rapport}
+
+\setcounter{section}{0}
+\usepackage{graphicx}
+\graphicspath{{images}}
+\usepackage{booktabs}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Informations générales
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%TODO Formation concernée : à compléter.
+% Exemples : Licence d'Informatique, Master d'Informatique.
+\major{CentraleSupélec}
+
+%TODO Parcours ou spécialité de la formation
+% Exemples pour la licence : Systèmes et Réseaux Informatiques, Ingénierie Logicielle.
+% Exemples pour le master : Ingénierie du Logiciel pour la Société Numérique, Réseaux Informatiques et Services Mobiles.
+\specialization{FISA}
+
+%TODO UE concernée par le rapport (à modifier).
+% exemple : Projet Algorithmique
+\course{SIP}
+
+%TODO UCE concernée par le rapport (à modifier, optionnel).
+%\subcourse{RedActed}
+
+%TODO Titre du document, à adapter.
+\title{Rapport de TP}
+\subtitle{Développement d'une API pour la DGSE} % seulement si nécessaire
+
+%TODO Liste des auteurs
+\author{
+Ewen DENIAU\\
+Nathan LEROUGE
+}
+
+%TODO Liste des encadrants, responsables d'UE, etc. (optionnel)
+%\advisor[Responsables]{ % indiquez ici le rôle (par défaut : "Encadrement")
+%	Prénom5 Nom5 \\ % il faut aller à la ligne entre chaque encadrant, comme pour les auteurs
+%	Prénom6 Nom6 \\
+%	Prénom7 Nom7
+%}
+\advisor[Professeur]{ % indiquez ici le rôle (par défaut : "Encadrement")
+ Sébastien KILIAN\\
+ Fanny DIJOUD\\
+ Erwan FASQUEL\\
+ Lucas GIORDANI
+}
+%TODO Groupe des auteurs
+% Optionnel : seulement si le travail est réalisé en groupe (en l'absence de groupe, ne définissez pas la macro)
+% Exemple : Groupe 1, G12, etc.
+%\group{Nom/numéro du groupe de travail}
+
+% Date de finalisation du rapport. 
+% La valeur par défaut, qui est recommandée, est la date du jour.
+%\date{\today}
+%\dateUpdt{}
+
+% affiliations des auteurs (pour un rapport de recherche uniquement)
+% \affiliations{
+%     \textsuperscript{1} Laboratoire Informatique d'Avignon -- LIA EA 4128 \\
+%     \textsuperscript{2} Laboratoire Biens, Normes, et Contrats - LBNC EA 3788
+% }
+
+% Il est possible de définir un résumé du document (optionnel) avec la commande \resume comme ci-dessous. 
+% Si la commande n’apparaît pas, le résumé n'est pas inséré dans le document.
+% \summary{Ce document est une introduction à \LaTeX{}. Il s'agit à la fois d'un tutoriel décrivant les principales fonctionnalités de ce système de composition de documents, et d'un modèle servant d'exemple à l'élaboration d'un document. Il utilise le fichier de mise en forme fourni pour l'écriture de rapports dans le cadre des enseignements donnés au CERI, Université d'Avignon.}
+% \summary{Ce document est la première version du rapport à produire dans le cadre du stage de fin d'année en Licence 3 MIS - CMI. Il va introduire ce qui a pu être réalisé lors du premier mois du stage.}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Bibliographie
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Désigne le fichier bibliographique à utiliser
+% \addbibresource{bibliographie.bib}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Début du document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document} 
+
+% Création de la page de titre.
+\maketitle
+
+% Justification moins stricte : empêche certains mots de dépasser dans la marge
+\sloppy      
+
+\section{Introduction}
+Ce document est le rapport de rendu du TP de SIP.
+TP dans lequel nous devions développer une API où nous collections et assemblons plusieurs informations concernant des vols et des aéroports.
+
+Le travail a été effectué par Ewen Deniau et Hakaroa Vallée dans le cadre du cours de SIP.
+Les scripts ont été programmés en Python, avec les librairies suivantes :
+\begin{itemize}
+    \item Pandas
+    \item Sqlite
+    \item Flask
+\end{itemize}
+
+Vous pourrez retrouver le code sur le repo suivant : \href{https://github.com/Bismuth10K/flights-api}{Bismuth10K/flights-api}
+
+\section{Database design}
+\subsection{Question 1}
+La première tâche de ce projet consiste à élaborer un diagramme entité-relation (ER) pour identifier les différentes entités et les relations qui existent entre elles. Ce diagramme nous permet de visualiser les interactions entre des éléments essentiels comme les compagnies aériennes, les vols, les aéroports, les utilisateur et les pays. Par exemple, un vol est caractérisé par un aéroport de départ, une heure de départ, un aéroport et une heure d'arrivé, le type d'avion utilisé pour ce vol et son prix. Une fois ce modèle ER conçu, nous le traduisons en un modèle relationnel sous forme de tables dans une base de données relationnelles.
+
+Chaque table doit contenir une clé primaire pour garantir l’unicité des enregistrements (par exemple, \texttt{flight_id} pour les vols). Les clés étrangères assurent la cohérence des relations entre les tables (comme un champ \texttt{isao_country_code} dans une table d'aéroports pour lier chaque aéroport au pays dans lequel il est situé). Nous adoptons la troisième forme normale (3NF), une norme de structuration qui permet d’éviter les redondances et de minimiser les anomalies lors des insertions, suppressions ou mises à jour.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/diag_er.png}
+    \caption{Diagramme entité-relation}
+    \label{fig:diag_er}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/diag_phys.png}
+    \caption{Modèle physique}
+    \label{fig:diag_phys}
+\end{figure}
+
+\section{\textit{Create the database}}
+\subsection{Question 2 et 3}
+Ce script permet de séparer le fichier all.csv en différente table d'une dataframe pandas pour structurer les données. Ainsi ce script renvoie une liste de dataframe pandas représentant chacun une table calquant le diagramme ER. 
+
+\subsection{Question 5}
+Ce script permet de crée la base de donnée qui sera utilisé plus tard. L'organisation de celle-ci se base encore sur le Diagramme ER a
+
+
+
+
+
+
+
+\section{\textit{Create the first API routes}}
+\subsection{Question 14}
+Ce script créé l'application (i.e. le serveur web) sur le port 5000 du serveur où sera hébergé le code. Le serveur web est géré par la librairie Flask.
+
+\subsection{Question 15}
+Pour obtenir tous les \textit{users}, il faut juste aller à la racine du blueprint \texttt{users} comme en témoigne la ligne suivante :
+
+\begin{lstlisting}[language=python]
+@users_bp.route("/", methods=["GET"])
+def get_all_users():
+    <code>
+\end{lstlisting}
+
+Le premier paramètre de la méthode route définit la suite de l'url, en l'occurence un slash simple donc la racine. Nous devons donc accéder à l'url suivant : \texttt{\url{http://localhost:5000/users/}}
+
+Et enfin, il s'agit d'une requête \texttt{GET}.
+
+\subsection{Question 16}
+Pour les questions de ce genre, nous vous redirigons vers le script \texttt{test_requests.py} et d'appeler les fonctions de votre choix.
+
+
+
+\subsection{Question 24}
+Préciser comment on a modifié le split dans le check du token avec accord de Fanny
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Crédits
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Crédits}
+Nous voulons remercier les professeurs de leurs aides et de leurs cours lors du développement de ce TP.
+Nous remercions aussi tous les forums et tutos qui existent en ligne et qui nous ont aidé.
+
+\subsection{Document}
+Le template du document provient de Vincent Labatut (\url{vincent.labatut@univ-avignon.fr}) tel que modifié par Simon Leclercq (\url{leclercq.e2102543@etud.univ-ubs.fr}).
+Les modifications supplémentaires ainsi que la page de garde proviennent d'Ewen Deniau (\url{ewen.deniau@student-cs.fr}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Bibliographie
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\nocite{*}
+\MyBibliography
+
+\end{document}
