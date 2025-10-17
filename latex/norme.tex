@@ -4,9 +4,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Classe du document
 
-% \documentclass{ceri/sty/rapport}
+\documentclass{ceri/sty/rapport}
 % \documentclass[handout]{ceri/sty/rapport}
-\documentclass[light]{ceri/sty/rapport}
+% \documentclass[light]{ceri/sty/rapport}
 % \documentclass[full]{ceri/sty/rapport}
 % \documentclass[blue]{ceri/sty/rapport}
 
@@ -106,7 +106,7 @@ Le travail a été effectué par Ewen Deniau et Hakaroa Vallée dans le cadre du
 Les scripts ont été programmés en Python, avec les librairies suivantes :
 \begin{itemize}
     \item Pandas
-    \item Sqlite
+    \item SQLite
     \item Flask
 \end{itemize}
 
@@ -116,7 +116,9 @@ Vous pourrez retrouver le code sur le repo suivant : \href{https://github.com/Bi
 \subsection{Question 1}
 La première tâche de ce projet consiste à élaborer un diagramme entité-relation (ER) pour identifier les différentes entités et les relations qui existent entre elles. Ce diagramme nous permet de visualiser les interactions entre des éléments essentiels comme les compagnies aériennes, les vols, les aéroports, les utilisateur et les pays. Par exemple, un vol est caractérisé par un aéroport de départ, une heure de départ, un aéroport et une heure d'arrivé, le type d'avion utilisé pour ce vol et son prix. Une fois ce modèle ER conçu, nous le traduisons en un modèle relationnel sous forme de tables dans une base de données relationnelles.
 
-Chaque table doit contenir une clé primaire pour garantir l’unicité des enregistrements (par exemple, \texttt{flight_id} pour les vols). Les clés étrangères assurent la cohérence des relations entre les tables (comme un champ \texttt{isao_country_code} dans une table d'aéroports pour lier chaque aéroport au pays dans lequel il est situé). Nous adoptons la troisième forme normale (3NF), une norme de structuration qui permet d’éviter les redondances et de minimiser les anomalies lors des insertions, suppressions ou mises à jour.
+Chaque table doit contenir une clé primaire pour garantir l'unicité des enregistrements (par exemple, \texttt{flight\_id} pour les vols).
+Les clés étrangères assurent la cohérence des relations entre les tables (comme un champ \texttt{isao\_country\_code} dans une table d'aéroports pour lier chaque aéroport au pays dans lequel il est situé).
+Nous adoptons la troisième forme normale (3NF), une norme de structuration qui permet d'éviter les redondances et de minimiser les anomalies lors des insertions, suppressions ou mises à jour.
 
 \begin{figure}[h]
     \centering
@@ -150,7 +152,7 @@ Ce script permet de crée la base de donnée qui sera utilisé plus tard. L'orga
 Ce script créé l'application (i.e. le serveur web) sur le port 5000 du serveur où sera hébergé le code. Le serveur web est géré par la librairie Flask.
 
 \subsection{Question 15}
-Pour obtenir tous les \textit{users}, il faut juste aller à la racine du blueprint \texttt{users} comme en témoigne la ligne suivante :
+Pour obtenir tous les \texttt{users}, il faut juste aller à la racine du blueprint \texttt{users} comme en témoigne la ligne suivante :
 
 \begin{lstlisting}[language=python]
 @users_bp.route("/", methods=["GET"])
@@ -163,9 +165,7 @@ Le premier paramètre de la méthode route définit la suite de l'url, en l'occu
 Et enfin, il s'agit d'une requête \texttt{GET}.
 
 \subsection{Question 16}
-Pour les questions de ce genre, nous vous redirigons vers le script \texttt{test_requests.py} et d'appeler les fonctions de votre choix.
-
-
+Pour les questions de ce genre, nous vous redirigeons vers le script \texttt{test\_requests.py} et d'appeler les fonctions de votre choix.
 
 \subsection{Question 24}
 Préciser comment on a modifié le split dans le check du token avec accord de Fanny
@@ -185,6 +185,6 @@ Les modifications supplémentaires ainsi que la page de garde proviennent d'Ewen
 %% Bibliographie
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \nocite{*}
-\MyBibliography
+% \MyBibliography
 
 \end{document}
