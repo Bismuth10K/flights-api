@@ -4,6 +4,8 @@ from db import get_db_connexion, close_db_connexion
 
 import db.airports, db.flights, db.airlines
 
+from utils import token_required
+
 data_bp = Blueprint("data", __name__)
 
 

@@ -2,8 +2,11 @@ from flask import Flask
 
 from db import init_database
 
-from routes.users import users_bp
+from routes.auth import auth_bp
+from routes.bookings import orders_bp
 from routes.data import data_bp
+from routes.flights import flights_bp
+from routes.users import users_bp
 
 from test_users import *
 
@@ -21,10 +24,11 @@ def create_app():
     # Add a first blueprints with all routes for the API
     # Take a look at the file ./routes/users.py to have more
     # details about the routes you have access to.
-    app.register_blueprint(users_bp, url_prefix="/users")
+    app.register_blueprint(auth_bp, url_prefix="/login")
     app.register_blueprint(data_bp, url_prefix="/data")
-
-    # TODO - ADD OTHER BLUEPRINTS
+    app.register_blueprint(flights_bp, url_prefix="/flights")
+    app.register_blueprint(orders_bp, url_prefix="/orders")
+    app.register_blueprint(users_bp, url_prefix="/users")
 
     return app
 

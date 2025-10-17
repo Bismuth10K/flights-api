@@ -4,10 +4,13 @@ from db import get_db_connexion, close_db_connexion
 
 import db.users
 
+from utils import token_required
+
 users_bp = Blueprint("users", __name__)
 
 
 @users_bp.route("/", methods=["GET"])
+@token_required
 def get_all_users():
     """Fetch all users from the database.
 
@@ -34,6 +37,7 @@ def get_all_users():
 
 
 @users_bp.route("/<user_name>", methods=["GET"])
+@token_required
 def get_user(user_name):
     """Fetch a single user from the database based on its username.
 
@@ -70,6 +74,7 @@ def get_user(user_name):
 
 
 @users_bp.route("/<user_name>", methods=["PATCH"])
+@token_required
 def patch_password(user_name):
     """Patch the password of an user.
     The password must be passed in the data of the POST request.

@@ -35,7 +35,7 @@ def insert_user(user, cursor):
 
         query_insert_user = "INSERT INTO User (username, password) VALUES (?, ?)"
         cursor.execute(query_insert_user,
-                       (user["username"], user["password"]))
+                       (user["username"], utils.hash_password(user["password"])))
 
     except sqlite3.IntegrityError as error:
         print(f"An integrity error occurred while insert the user: {error}")
@@ -69,10 +69,10 @@ def get_user(username, cursor):
 
         user = cursor.fetchone()
 
-        query_get_orders = "SELECT id FROM Order WHERE user_username = ?"
-        cursor.execute(query_get_orders, [username])
+        # query_get_orders = "SELECT id FROM Order WHERE user_username = ?"
+        # cursor.execute(query_get_orders, [username])
 
-        orders = cursor.fetchall()
+        # orders = cursor.fetchall()
 
     except sqlite3.IntegrityError as error:
         print(f"An integrity error occurred while fetching the user: {error}")
@@ -83,7 +83,7 @@ def get_user(username, cursor):
 
     return {
         "username": user["username"],
-        "orders": orders,
+        # "orders": orders,
         "password": user["password"],
     }
 
@@ -133,7 +133,6 @@ def update_password(username, password, cursor):
     bool
         True if no error occurs, False otherwise.
     """
-    # TODO
-    raise NotImplementedError
+    return True
 
     

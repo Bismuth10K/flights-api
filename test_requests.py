@@ -1,8 +1,12 @@
 import requests
 import json
 
-def q16():
-    req = requests.get("http://localhost:5000/users")
+def q16(token = None):
+    if not token:
+        headers={'content-type': 'application/json'}
+    else:
+        headers={'content-type': 'application/json', 'Authorization': token}
+    req = requests.get("http://localhost:5000/users", headers=headers)
     return req
 
 
@@ -23,9 +27,18 @@ def q17_add_user():
     req = requests.post('http://localhost:5000/users/', data=json.dumps(payload), headers=headers)
     return req
 
+def login():
+    headers={'content-type': 'application/json'}
+    payload={'username': 'hubulle', 'password': '222'}
+    req = requests.post('http://localhost:5000/login/login', data=json.dumps(payload), headers=headers)
+    print(req.json())
+    return req.json()["token"]
+
 
 # print(q16().json())
 # print(q17_get_hubert().json())
 # print(q17_patch().json())
-print(q17_add_user().json())
+# print(q17_add_user().json())
 print(q16().json())
+token = login()
+print(q16(token).json())
