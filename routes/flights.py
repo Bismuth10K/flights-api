@@ -2,6 +2,10 @@ from flask import Blueprint, jsonify, request
 
 from utils import token_required
 
+from db import get_db_connexion, close_db_connexion
+
+import db.flights
+
 flights_bp = Blueprint("flights", __name__)
 
 
@@ -38,9 +42,28 @@ def create_flight():
         400 if the flight could not be created
         500 if an error occurred while creating the flight
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    try:
+        departure_time = request.json.get('departure_time')
+        arrival_time = request.json.get('arrival_time')
+        price = request.json.get('price')
+        src_icao = request.json.get('src_icao')
+        dest_icao = request.json.get('dest_icao')
+        plane_icao = request.json.get('plane_icao')
+        airline_icao = request.json.get('airline_icao')
 
+        if not (departure_time and arrival_time and price and src_icao and dest_icao and plane_icao and airline_icao):
+            return jsonify({"message": "User or flight not provided"}), 404
+
+        conn = get_db_connexion()
+        cursor = conn.cursor()
+        db.flights.insert_flight(cursor, departure_time, arrival_time, price, src_icao, dest_icao, plane_icao, airline_icao)
+        
+        conn.commit()
+
+        return jsonify({"message": "Done"}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: while adding a new booking - {str(e)}"}), 500
 
 
 @flights_bp.route("/<int:flight_id>", methods=["GET"])
@@ -63,8 +86,18 @@ def get_flight(flight_id):
         404 if the flight does not exist
         500 if an error occurred while fetching
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    conn = get_db_connexion()
+    cursor = conn.cursor()
+
+    flight = db.flights.get_flight_by_id(cursor, flight_id)
+    if flight == None:
+        conn.rollback()
+        close_db_connexion(cursor, conn)
+        return "Error: while fetching flights", 500
+    conn.commit()
+    close_db_connexion(cursor, conn)
+    return jsonify({"flight": dict(flight)})
+
 
 @flights_bp.route("/search", methods=["GET"])
 def search_flights():
@@ -89,5 +122,24 @@ def search_flights():
         404 if no flights are found
         500 if an error occurred while fetching
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    try:
+        src_city = request.json.get('src_city')
+        dest_city = request.json.get('dest_city')
+
+        if not (src_city and dest_city):
+            return jsonify({"message": "User or flight not provided"}), 404
+
+        conn = get_db_connexion()
+        cursor = conn.cursor()
+        flights = db.flights.get_flights_by_src_city_and_dest_city(cursor, src_city, dest_city)
+        if flights == None:
+            conn.rollback()
+            close_db_connexion(cursor, conn)
+            return "Error: while fetching flights", 500
+
+        conn.commit()
+
+        return jsonify({"flights": dict(flights)}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: while adding a new booking - {str(e)}"}), 500

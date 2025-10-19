@@ -1,6 +1,11 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+
+from db import get_db_connexion, close_db_connexion
+
+import db.booking
 
 from utils import token_required
+
 
 orders_bp = Blueprint("orders", __name__)
 
@@ -27,8 +32,17 @@ def get_booking(order_id: int):
         404 if the booking does not exist in the database
         500 if an error occured while fetching the booking
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    conn = get_db_connexion()
+    cursor = conn.cursor()
+
+    booking = db.booking.get_booking(order_id, cursor)
+    if booking == None:
+        conn.rollback()
+        close_db_connexion(cursor, conn)
+        return "Error: while fetching bookings", 500
+    conn.commit()
+    close_db_connexion(cursor, conn)
+    return jsonify({"booking": dict(booking)})
 
 
 @orders_bp.route("/", methods=["POST"])
@@ -55,7 +69,23 @@ def create_booking():
         400 if the booking could not be created
         500 if an error occurred while creating the booking
     """
-    return jsonify({"message": "TODO"})
+    try:
+        user_id = request.json.get('user_id')
+        flight_id = request.json.get('flight_id')
+
+        if not user_id or not flight_id:
+            return jsonify({"message": "User or flight not provided"}), 404
+
+        conn = get_db_connexion()
+        cursor = conn.cursor()
+        db.booking.create_booking(cursor, user_id, flight_id)
+        
+        conn.commit()
+
+        return jsonify({"message": "Done"}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: while adding a new booking - {str(e)}"}), 500
 
 
 @orders_bp.route("/user/<string:user_name>", methods=["GET"])
@@ -79,8 +109,20 @@ def get_user_bookings(user_name):
         404 if no bookings are found
         500 if an error occurred while fetching
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    try:
+        if not user_name:
+            return jsonify({"message": "User not provided"}), 404
+
+        conn = get_db_connexion()
+        cursor = conn.cursor()
+        lst_booking = db.booking.get_bookings_by_user(cursor, user_name)
+        if lst_booking == None:
+            return jsonify({"message": "Error: no bookings found for this user"}), 404
+
+        return jsonify({"User's bookings": dict(lst_booking)}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: while adding a new user - {str(e)}"}), 500
 
 
 @orders_bp.route("/flight/<int:flight_id>", methods=["GET"])
@@ -104,5 +146,17 @@ def get_flight_users(flight_id):
         404 if no users are found
         500 if an error occurred while fetching
     """
-    # TODO
-    return jsonify({"message": "TODO"})
+    try:
+        if not flight_id:
+            return jsonify({"message": "Flight not provided"}), 404
+
+        conn = get_db_connexion()
+        cursor = conn.cursor()
+        lst_users = db.booking.get_usernames_by_flight(cursor, flight_id)
+        if lst_users == None:
+            return jsonify({"message": "Error: no bookings found for this user"}), 404
+
+        return jsonify({"Flight's users": dict(lst_users)}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: while adding a new user - {str(e)}"}), 500

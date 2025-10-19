@@ -40,3 +40,37 @@ def delete_booking(cursor: Cursor, user_name: str, flight_id: int) -> bool:
     except sqlite3.Error() as error: 
         return False 
     
+
+def get_booking(booking_id, cursor):
+    """Get a booking from the database based on its ID.
+
+    Parameters
+    ----------
+    booking_ID: integer
+        Booking ID.
+    cursor:
+        The object used to query the database.
+
+    Returns
+    -------
+    dict
+        All infos about this booking if no error occurs, None otherwise.
+    """
+    try:
+        query_get_booking = "SELECT * FROM Booking WHERE booking_id = ?"
+        cursor.execute(query_get_booking, [booking_id])
+
+        booking = cursor.fetchone()
+
+    except sqlite3.IntegrityError as error:
+        print(f"An integrity error occurred while fetching the booking: {error}")
+        return None
+    except sqlite3.Error as error:
+        print(f"A database error occurred while fetching the booking: {error}")
+        return None
+
+    return {
+        "booking_id": booking_id["booking_id"],
+        "user_id": booking_id["user_id"],
+        "flight_id": booking_id["flight_id"],
+    }
