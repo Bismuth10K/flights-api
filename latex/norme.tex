@@ -156,10 +156,27 @@ Cette fonction a besoin de \texttt{cursor} afin d'exécuter des requêtes SQL, e
 
 \section{\textit{First communications with the database}}
 \subsection{Question 8}
+Nous avons lu, ce fut très fructueux.
+
 \subsection{Question 9}
+Il manquait l'appel de la méthode \texttt{conn.commit()}.
+Le \textit{commit} sert à confirmer les modifications effectuées sur la base de données.
+
 \subsection{Question 10}
+Nous sommes dans le regret de vous annoncer qu'aucune erreur nous a marqué à l'heure où nous écrivons ces lignes.
+Nous écrivons le rapport après avoir fini le code, et nous nous sommes organisés de façon à ce que nous ignorions complètement ce qui était demandé dans cette question.
+
+En vous remerciant de votre compréhension.
+
 \subsection{Question 11}
+Nous vous laissons lire l'implémentation.
+Nous avons aussi pris le soin de de hasher le mot de passe comme demandé plus tard.
+
 \subsection{Question 12}
+Quand nous essayons de modifier le mot de passe d'un utilisateur inexistant, cela ne marche pas.
+L'utilisateur n'est pas trouvé dans la BDD.
+
+
 
 \section{\textit{Database manipulation}}
 \subsection{Question 13}
@@ -209,9 +226,31 @@ Elle n'est pas très poussée et suis globalement la documentation de la librair
 
 Ensuite, nous appelons les fonctions adaptées dans la fonction \texttt{insert\_user()}.
 
+\subsection{Question 22 - 24}
+Les tokens sont implémentés et fonctionnent correctement.
+Nous vous laissons voir l'implémentation encore une fois.
 
-\subsection{Question 24}
-Préciser comment on a modifié le split dans le check du token avec accord de Fanny
+Pour le décorateur, nous avons surtout décidé de le mettre sur des fonctions ayant besoin d'une forme d'authentification.
+Par exemple, nous ne pouvons pas laisser n'importe qui observer la liste des voyageurs d'un vol, car la protection des données n'est pas respectée.
+Nous sommes aussi partis du principe que les agents allaient aussi avoir des \textit{tokens}.
+
+Certaines fonctions n'ayant pour but que de chercher tous les vols (par exemple) n'ont pas besoin de \textit{tokens}.
+Puisqu'ils permettent à une personne d'observer les vols avant d'acheter, et donc de ce faire un compte.
+
+Nous souhaitons vous faire remarquer deux choses :
+
+\begin{itemize}
+    \item Premièrement, il serait pertinent de modifier les fonctions afin de lire l'utilisateur dans le \textit{token}. 
+    Ainsi, nous pouvons lui assigner directement une réservation à son nom.
+    \item Secondement, nous avons mentionné les agents.
+    Nous pensons que rajouter des droits et des privilèges en fonction des gens rajouteraient une couche de sécurité. 
+\end{itemize}
+
+
+\begin{beware}[Remarque]
+Lors de l'implémentation du \textit{token}, nous avons remarqué que le code fourni appliquait un \texttt{split} et prenait le second élément pour récupérer le \textit{token}.
+Après concertation avec madame Dijoud, j'ai eu son accord pour modifier cette partie afin de récupérer directement le \textit{token} sans opérations supplémentaires.
+\end{beware}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Crédits
