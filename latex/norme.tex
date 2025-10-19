@@ -136,16 +136,36 @@ Nous adoptons la troisième forme normale (3NF), une norme de structuration qui 
 
 \section{\textit{Create the database}}
 \subsection{Question 2 et 3}
-Ce script permet de séparer le fichier all.csv en différente table d'une dataframe pandas pour structurer les données. Ainsi ce script renvoie une liste de dataframe pandas représentant chacun une table calquant le diagramme ER. 
+Ce script permet de séparer le fichier all.csv en différentes tables sous la forme d'un \textit{dataframe} pandas afin de structurer les données.
+Ainsi ce script renvoie une liste de \textit{dataframes} pandas représentant chacun une table calquant le diagramme ER. 
 
 \subsection{Question 5}
-Ce script permet de crée la base de donnée qui sera utilisé plus tard. L'organisation de celle-ci se base encore sur le Diagramme ER a
+Ce script permet de créer la base de données qui sera utilisée plus tard. 
+L'organisation de celle-ci se base toujours sur le Diagramme ER en rajoutant des tables si nécessaire (\textit{e.g.} la table \texttt{Booking} liant \texttt{User} et \texttt{Flights}).
 
+\subsection{Question 6}
+À l'aide des \textit{dataframes} pandas et des tables SQL vides dans notre database, nous remplissons les tables des informations des \textit{dataframes}.
+Pour cela, nous utilisons la commande SQL : \texttt{INSERT INTO ... VALUES ...}.
 
+Pour certaines tables, une clé primaire "…\_id" était nécessaire pour distinguer tous les vols, tous les utilisateurs ou toutes les réservations.
+Pour garantir l'unicité des identifiants, nous avons utilisé un incrémenteur automatique, ici le numéro de ligne.
 
+\subsection{Question 7}
+Dans la fonction \texttt{init\_database()}, nous devons maintenant appeler correctement la fonction \texttt{populate\_database()}.
+Cette fonction a besoin de \texttt{cursor} afin d'exécuter des requêtes SQL, et de \texttt{conn} qui permet la connexion à la BDD, ainsi que la liste des \textit{dataframes} pandas contenant toutes les informations à remplir dans les tables SQL.
 
+\section{\textit{First communications with the database}}
+\subsection{Question 8}
+\subsection{Question 9}
+\subsection{Question 10}
+\subsection{Question 11}
+\subsection{Question 12}
 
-
+\section{\textit{Database manipulation}}
+\subsection{Question 13}
+Cette série de fonction permet d'utiliser au mieux la database pour des demandes récurrentes.
+Par exemple : connaître le nom d'une ville lorsqu'on ne connaît que son code ISO, connaître toutes les informations d'un aéroport simplement avec son id.
+Cela permet d'utiliser la database efficacement.
 
 \section{\textit{Create the first API routes}}
 \subsection{Question 14}
@@ -166,6 +186,29 @@ Et enfin, il s'agit d'une requête \texttt{GET}.
 
 \subsection{Question 16}
 Pour les questions de ce genre, nous vous redirigeons vers le script \texttt{test\_requests.py} et d'appeler les fonctions de votre choix.
+
+\subsection{Question 17}
+Nous vous redirigeons vers le script correspondant pour voir l'implémentation.
+
+\section{\textit{Help to debug}}
+\subsection{Question 18}
+Nous vous redirigeons vers le script correspondant pour voir l'implémentation.
+Nous avons aussi implémenté des fonctions supplémentaires afin de nous simplifier le travail et de compléter des fonctions non réalisés dans la bibliothèque db.
+
+\section{\textit{Remaining routes}}
+\subsection{Question 19}
+Même réponse que pour la 18, et nous y avons aussi créés des fonctions supplémentaires.
+
+Idéalement, toutes ces fonctions devraient être confirmées par des tests unitaires.
+N'étant pas le sujet principal de ce TP, nous continuons ainsi.
+
+\section{\textit{Securing the API}}
+\subsection{Question 20 - 21}
+Nous vous laissons aussi voir l'implémentation. 
+Elle n'est pas très poussée et suis globalement la documentation de la librairie.
+
+Ensuite, nous appelons les fonctions adaptées dans la fonction \texttt{insert\_user()}.
+
 
 \subsection{Question 24}
 Préciser comment on a modifié le split dans le check du token avec accord de Fanny
