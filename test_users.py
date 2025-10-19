@@ -96,6 +96,7 @@ def test_update_password_non_existing_user():
 if __name__ == "__main__":
 
     test_insert_user()
+    test_update_password_existing_user()
     print_users()
 
     # test_update_password_existing_user()

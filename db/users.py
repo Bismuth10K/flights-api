@@ -133,6 +133,16 @@ def update_password(username, password, cursor):
     bool
         True if no error occurs, False otherwise.
     """
+    try:
+        val = utils.hash_password(password)
+        cursor.execute(f"UPDATE User SET password = {val} WHERE username = {username}")
+
+    except sqlite3.IntegrityError as error:
+        print(f"An integrity error occurred while fetching the users: {error}")
+        return None
+    except sqlite3.Error as error:
+        print(f"A database error occurred while fetching the users: {error}")
+        return None
     return True
 
     

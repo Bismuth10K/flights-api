@@ -39,5 +39,6 @@ if __name__ == "__main__":
     app = create_app()
     init_database()
     test_insert_user()
+    test_update_password_existing_user()
     print_users()
     app.run(port=5000, debug=False)
