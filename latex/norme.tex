@@ -102,7 +102,7 @@ Nathan LEROUGE
 Ce document est le rapport de rendu du TP de SIP.
 TP dans lequel nous devions développer une API où nous collections et assemblons plusieurs informations concernant des vols et des aéroports.
 
-Le travail a été effectué par Ewen Deniau et Hakaroa Vallée dans le cadre du cours de SIP.
+Le travail a été effectué par Ewen Deniau et Nathan Lerouge dans le cadre du cours de SIP.
 Les scripts ont été programmés en Python, avec les librairies suivantes :
 \begin{itemize}
     \item Pandas
@@ -114,7 +114,7 @@ Vous pourrez retrouver le code sur le repo suivant : \href{https://github.com/Bi
 
 \section{Database design}
 \subsection{Question 1}
-La première tâche de ce projet consiste à élaborer un diagramme entité-relation (ER) pour identifier les différentes entités et les relations qui existent entre elles. Ce diagramme nous permet de visualiser les interactions entre des éléments essentiels comme les compagnies aériennes, les vols, les aéroports, les utilisateur et les pays. Par exemple, un vol est caractérisé par un aéroport de départ, une heure de départ, un aéroport et une heure d'arrivé, le type d'avion utilisé pour ce vol et son prix. Une fois ce modèle ER conçu, nous le traduisons en un modèle relationnel sous forme de tables dans une base de données relationnelles.
+La première tâche de ce projet consiste à élaborer un diagramme entité-relation (ER) pour identifier les différentes entités et les relations qui existent entre elles. Ce diagramme nous permet de visualiser les interactions entre des éléments essentiels comme les compagnies aériennes, les vols, les aéroports, les utilisateurs et les pays. Par exemple, un vol est caractérisé par un aéroport de départ, une heure de départ, un aéroport et une heure d'arrivée, le type d'avion utilisé pour ce vol et son prix. Une fois ce modèle ER conçu, nous le traduisons en un modèle relationnel sous forme de tables dans une base de données relationnelle.
 
 Chaque table doit contenir une clé primaire pour garantir l'unicité des enregistrements (par exemple, \texttt{flight\_id} pour les vols).
 Les clés étrangères assurent la cohérence des relations entre les tables (comme un champ \texttt{isao\_country\_code} dans une table d'aéroports pour lier chaque aéroport au pays dans lequel il est situé).
@@ -137,14 +137,14 @@ Nous adoptons la troisième forme normale (3NF), une norme de structuration qui 
 \section{\textit{Create the database}}
 \subsection{Question 2 et 3}
 Ce script permet de séparer le fichier all.csv en différentes tables sous la forme d'un \textit{dataframe} pandas afin de structurer les données.
-Ainsi ce script renvoie une liste de \textit{dataframes} pandas représentant chacun une table calquant le diagramme ER. 
+Ainsi ce script renvoie une liste de \textit{dataframes} pandas représentant chacun une table, calquant le diagramme ER. 
 
 \subsection{Question 5}
 Ce script permet de créer la base de données qui sera utilisée plus tard. 
-L'organisation de celle-ci se base toujours sur le Diagramme ER en rajoutant des tables si nécessaire (\textit{e.g.} la table \texttt{Booking} liant \texttt{User} et \texttt{Flights}).
+L'organisation de celle-ci se base toujours sur le Diagramme ER en y rajoutant des tables si nécessaire (\textit{e.g.} la table \texttt{Booking} liant \texttt{User} et \texttt{Flights}).
 
 \subsection{Question 6}
-À l'aide des \textit{dataframes} pandas et des tables SQL vides dans notre database, nous remplissons les tables des informations des \textit{dataframes}.
+À l'aide des \textit{dataframes} pandas et des tables SQL vides dans notre database, nous remplissons les tables avec les informations des \textit{dataframes}.
 Pour cela, nous utilisons la commande SQL : \texttt{INSERT INTO ... VALUES ...}.
 
 Pour certaines tables, une clé primaire "…\_id" était nécessaire pour distinguer tous les vols, tous les utilisateurs ou toutes les réservations.
@@ -170,7 +170,7 @@ En vous remerciant de votre compréhension.
 
 \subsection{Question 11}
 Nous vous laissons lire l'implémentation.
-Nous avons aussi pris le soin de de hasher le mot de passe comme demandé plus tard.
+Nous avons aussi pris le soin de hasher le mot de passe comme demandé plus tard.
 
 \subsection{Question 12}
 Quand nous essayons de modifier le mot de passe d'un utilisateur inexistant, cela ne marche pas.
